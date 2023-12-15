@@ -1,0 +1,37 @@
+body {
+    font-family: 'Arial', sans-serif;
+}
+
+.container {
+    max-width: 800px;
+    margin: 50px auto;
+}
+
+form {
+    margin-bottom: 20px;
+    color: white;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+/* Add these styles to your existing style.css file or create a new one */
+
+/* Set the text color of the location names and smart devices to white */
+.table th,
+.table td {
+    color: white;
+}
+
+/* Optional: Add background color for better visibility */
+.table th,
+.table td {
+    background-color: #343a40;
+}
+
