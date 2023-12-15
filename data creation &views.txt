@@ -1,0 +1,411 @@
+sh-4.4# mysql
+ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: NO)
+sh-4.4# mysql -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 13
+Server version: 8.2.0 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2023, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+
+
+mysql> create database varsha;
+Query OK, 1 row affected (0.04 sec)
+
+mysql> use database varsha;
+ERROR 1049 (42000): Unknown database 'database'
+mysql> use varsha;
+Database changed
+
+mysql> CREATE TABLE Customers ( CID INT PRIMARY KEY AUTO_INCREMENT, FirstName VARCHAR(255), LastName VARCHAR(255), Email VARCHAR(255), AddressNoSt VARCHAR(255), City VARCHAR(255), State VARCHAR(255), ZipCode VARCHAR(10) );
+Query OK, 0 rows affected (0.13 sec)
+
+
+mysql> CREATE TABLE ServiceLocations ( SID INT PRIMARY KEY AUTO_INCREMENT, CID  INT, AddressNoSt VARCHAR(255), City VARCHAR(255), State VARCHAR(255),--XX ZipCode VARCHAR(10), DateOfTakeover DATE, Bedrooms INT, SquareFootage INT, Occupants INT, FOREIGN KEY (CID) REFERENCES Customers(CID) );
+Query OK, 0 rows affected (0.14 sec)
+
+mysql> CREATE TABLE Devices ( DeviceID INT PRIMARY KEY AUTO_INCREMENT,
+    -> DeviceName VARCHAR(255), DeviceType VARCHAR(255) );
+Query OK, 0 rows affected (0.16 sec)
+
+mysql> create table EnrolledDevices (EnrollmentID INT PRIMARY KEY AUTO_INCREMENT,DeviceID INT, SID INT, FOREIGN KEY (DeviceID)
+    -> REFERENCES Devices(DeviceID), FOREIGN KEY (SID) REFERENCES
+    -> ServiceLocations(SID) );
+Query OK, 0 rows affected (0.14 sec)
+
+mysql> CREATE TABLE DataUsage ( DataUsageID INT PRIMARY KEY AUTO_INCREMENT,
+    -> EnrollmentID INT, UsageTimestamp TIMESTAMP, EventLabel VARCHAR(255),
+    -> EnergyUsed DECIMAL(10, 2), FOREIGN KEY (EnrollmentID) REFERENCES
+    -> EnrolledDevices(EnrollmentID) );
+Query OK, 0 rows affected (0.21 sec)
+
+mysql> CREATE TABLE EnergyPrices ( PriceID INT PRIMARY KEY AUTO_INCREMENT,
+    -> ZipCode VARCHAR(10), PricePerkWh DECIMAL(10, 2), PricesTimestamp TIMESTAMP
+    -> );
+Query OK, 0 rows affected (0.10 sec)
+
+mysql> show tables;
++------------------+
+| Tables_in_varsha |
++------------------+
+| Customers        |
+| DataUsage        |
+| Devices          |
+| EnergyPrices     |
+| EnrolledDevices  |
+| ServiceLocations |
++------------------+
+6 rows in set (0.00 sec)
+
+mysql> INSERT INTO Customers VALUES
+    -> (1, 'John Doe', 'john.doe@example.com', 123, 'Main St', 'CityA', 'StateA', '12345'),
+    -> (2, 'Alice Smith', 'alice.smith@example.com', 789, 'Oak St', 'CityA', 'StateA', '54321'),
+    -> (3, 'Bob Johnson', 'bob.johnson@example.com', 456, 'Cedar St', 'CityC', 'StateC', '98765');
+Query OK, 3 rows affected (0.03 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+
+
+
+mysql> INSERT INTO Devices (DeviceID, DeviceName, DeviceType) VALUES     (1001, 'Smart Meter', 'SM123'),     (1002, 'Refrigerator', 'RF456'),     (1003, 'Air Conditioner', 'AC222');
+Query OK, 3 rows affected (0.03 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+
+mysql> INSERT INTO ServiceLocations (SID, CID, AddressNoSt, City, State, ZipCode, DateOfTakeover, Bedrooms, SquareFootage, Occupants)
+    -> VALUES
+    ->     (101, 1, '123 Main St', 'Brooklyn', 'NY', '12345', '2022-01-01', 2, 1000, 4),
+    ->     (102, 1, '456 Maple St', 'StatenIsland', 'NY', '54321', '2022-02-01', 3, 1000, 5),
+    -> ^C  (103, 3, '789 Oak St', 'Queens', 'NY', '98765', '2022-03-01', 2, 800, 3);
+
+mysql> INSERT INTO ServiceLocations (SID, CID, AddressNoSt, City, State, ZipCode, DateOfTakeover, Bedrooms, SquareFootage, Occupants)
+    -> VALUES
+    ->     (101, 1, '123 Main St', 'Brooklyn', 'NY', '12345', '2022-01-01', 2, 1000, 4),
+    ->     (102, 2, '456 Maple St', 'StatenIsland', 'NY', '54321', '2022-02-01', 3, 1000, 5),
+    ->     (103, 3, '789 Oak St', 'Queens', 'NY', '98765', '2022-03-01', 2, 800, 3);
+Query OK, 3 rows affected (0.02 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO EnrolledDevices (EnrollmentID, DeviceID, SID)
+    -> VALUES
+    ->     (10001, 1001, 101),
+    ->     (10002, 1002, 102),
+    ->     (10003, 1003, 103);
+Query OK, 3 rows affected (0.02 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO DataUsage (DataUsageID, EnrollmentID, UsageTimestamp, EventLabel, EnergyUsed) VALUES
+    -> (100001, 10001, '2022-08-01 12:00:00', 'switched on', 1.00),
+    -> (100002, 10001, '2022-08-01 12:15:00', 'energy use', 1.00),
+    -> (100003, 10001, '2022-08-01 12:30:00', 'energy use', 1.00),
+    -> (100004, 10001, '2022-08-01 12:45:00', 'energy use', 1.00),
+    -> (100005, 10001, '2022-08-01 13:00:00', 'switched off', NULL),
+    -> (100006, 10001, '2022-08-01 13:15:00', 'door opened', NULL),
+    -> (100007, 10002, '2022-08-01 12:15:00', 'door opened', NULL),
+    -> (100008, 10002, '2022-08-01 12:30:00', 'energy use', 0.10),
+    -> (100009, 10002, '2022-08-01 12:45:00', 'energy use', 0.10),
+    -> (100010, 10002, '2022-08-01 13:00:00', 'energy use', 0.20),
+    -> (100011, 10002, '2022-08-01 13:15:00', 'energy use', 0.20),
+    -> (100012, 10002, '2022-08-01 13:30:00', 'energy use', 0.20),
+    -> (100013, 10002, '2022-08-01 13:45:00', 'energy use', 0.30),
+    -> (100019, 10001, '2023-12-01 12:00:00', 'switched on', 1.00),
+    -> (100020, 10001, '2023-12-01 12:15:00', 'energy use', 1.00),
+    -> (100038, 10001, '2022-09-01 12:15:00', 'energy use', 2.00),
+    -> (100039, 10001, '2022-09-01 12:30:00', 'energy use', 3.00),
+    -> (100053, 10003, '2022-09-01 12:30:00', 'switched off', NULL);
+Query OK, 18 rows affected (0.03 sec)
+Records: 18  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO PriceData (PriceID, ZipCode, PricePerkWh, PricesTimestamp)
+    -> VALUES
+    ->     (1001, '12345', 0.10, '2022-08-01 12:00:00'),
+    ->     (1002, '54321', 0.12, '2022-08-01 12:15:00'),
+    ->     (1003, '98765', 0.08, '2022-08-01 12:30:00'),
+    ->     (1004, '12345', 0.10, '2022-09-01 13:00:00'),
+    ->     (1005, '54321', 0.12, '2022-09-01 13:15:00'),
+    ->     (1006, '98765', 0.08, '2022-09-01 13:30:00');
+ERROR 1146 (42S02): Table 'varsha.PriceData' doesn't exist
+mysql> INSERT INTO EnergyPrices (PriceID, ZipCode, PricePerkWh, PricesTimestamp) VALUES     (1001, '12345', 0.10, '2022-08-01 12:00:00'),     (1002, '54321', 0.12, '2022-08-01 12:15:00'),     (1003, '98765', 0.08, '2022-08-01 12:30:00'),     (1004, '12345', 0.10, '2022-09-01 13:00:00'),     (1005, '54321', 0.12, '2022-09-01 13:15:00'),     (1006, '98765', 0.08, '2022-09-01 13:30:00');
+Query OK, 6 rows affected (0.03 sec)
+Records: 6  Duplicates: 0  Warnings: 0
+
+mysql> desc ServiceLocations;
++----------------+--------------+------+-----+---------+----------------+
+| Field          | Type         | Null | Key | Default | Extra          |
++----------------+--------------+------+-----+---------+----------------+
+| SID            | int          | NO   | PRI | NULL    | auto_increment |
+| CID            | int          | YES  | MUL | NULL    |                |
+| AddressNoSt    | varchar(255) | YES  |     | NULL    |                |
+| City           | varchar(255) | YES  |     | NULL    |                |
+| State          | varchar(255) | YES  |     | NULL    |                |
+| ZipCode        | varchar(10)  | YES  |     | NULL    |                |
+| DateOfTakeover | date         | YES  |     | NULL    |                |
+| Bedrooms       | int          | YES  |     | NULL    |                |
+| SquareFootage  | int          | YES  |     | NULL    |                |
+| Occupants      | int          | YES  |     | NULL    |                |
++----------------+--------------+------+-----+---------+----------------+
+10 rows in set (0.01 sec)
+
+mysql> desc Devices;
++------------+--------------+------+-----+---------+----------------+
+| Field      | Type         | Null | Key | Default | Extra          |
++------------+--------------+------+-----+---------+----------------+
+| DeviceID   | int          | NO   | PRI | NULL    | auto_increment |
+| DeviceName | varchar(255) | YES  |     | NULL    |                |
+| DeviceType | varchar(255) | YES  |     | NULL    |                |
++------------+--------------+------+-----+---------+----------------+
+3 rows in set (0.01 sec)
+
+mysql> select * from Device
+    -> ;
+ERROR 1146 (42S02): Table 'varsha.Device' doesn't exist
+mysql> select * from Devices;
++----------+-----------------+------------+
+| DeviceID | DeviceName      | DeviceType |
++----------+-----------------+------------+
+|     1001 | Smart Meter     | SM123      |
+|     1002 | Refrigerator    | RF456      |
+|     1003 | Air Conditioner | AC222      |
++----------+-----------------+------------+
+3 rows in set (0.00 sec)
+
+mysql> CREATE TABLE users (
+    ->     id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     username VARCHAR(255) UNIQUE NOT NULL,
+    ->     password VARCHAR(255) NOT NULL
+    -> );
+Query OK, 0 rows affected (0.22 sec)
+
+mysql> select * from users;
+Empty set (0.00 sec)
+
+mysql> select * from users;
++----+---------------+---------------+
+| id | username      | password      |
++----+---------------+---------------+
+|  1 | your_username | your_password |
++----+---------------+---------------+
+1 row in set (0.00 sec)
+
+mysql> 1. CREATE VIEW DailyEnergyConsumption AS
+    ->     -> SELECT DATE(UsageTimestamp) AS Date, SUM(EnergyUsed) AS TotalEnergy
+    ->     -> FROM DataUsage
+    ->     -> GROUP BY DATE(UsageTimestamp);
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '1. CREATE VIEW DailyEnergyConsumption AS
+    -> SELECT DATE(UsageTimestamp) AS D' at line 1
+mysql> 
+mysql> 1. CREATE VIEW DailyEnergyConsumption AS
+    ->     -> SELECT DATE(UsageTimestamp) AS Date, SUM(EnergyUsed) AS TotalEnergy
+    ->     -> FROM DataUsage
+    ->     -> GROUP BY DATE(UsageTimestamp);
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '1. CREATE VIEW DailyEnergyConsumption AS
+    -> SELECT DATE(UsageTimestamp) AS D' at line 1
+mysql> CREATE VIEW DailyEnergyConsumption AS
+    -> SELECT DATE(UsageTimestamp) AS Date, SUM(EnergyUsed) AS TotalEnergy
+    ->  FROM DataUsage
+    ->  GROUP BY DATE(UsageTimestamp);
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> CREATE VIEW EnergyConsumptionPerDevice AS
+    ->      SELECT Devices.DeviceName, SUM(DataUsage.EnergyUsed) AS TotalEnergy
+    ->      FROM DataUsage
+    ->      JOIN EnrolledDevices ON DataUsage.EnrollmentID = EnrolledDevices.EnrollmentID
+    ->      JOIN Devices ON EnrolledDevices.DeviceID = Devices.DeviceID
+    ->      GROUP BY Devices.DeviceName;
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> CREATE VIEW AverageConsumptionComparison AS
+    ->      SELECT sl.SquareFootage, sl.Occupants, SUM(du.EnergyUsed) AS UserTotalEnergy,
+    ->             AVG(du.EnergyUsed) OVER (PARTITION BY sl.SquareFootage, sl.Occupants) AS AvgEnergy
+    ->      FROM DataUsage du
+    ->      JOIN EnrolledDevices ed ON du.EnrollmentID = ed.EnrollmentID
+    ->      JOIN ServiceLocations sl ON ed.SID = sl.SID
+    ->      GROUP BY sl.SID;
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> CREATE VIEW EnergyConsumptionWithPricing AS
+    ->      SELECT du.UsageTimestamp, du.EnergyUsed, ep.PricePerkWh,
+    ->             (ep.PricePerkWh * du.EnergyUsed) AS Cost,
+    ->             (SELECT MIN(PricePerkWh) FROM EnergyPrices) AS MinPricePerkWh
+    ->      FROM DataUsage du
+    ->      JOIN EnrolledDevices ed ON du.EnrollmentID = ed.EnrollmentID
+    ->      JOIN ServiceLocations sl ON ed.SID = sl.SID
+    ->      JOIN EnergyPrices ep ON sl.ZipCode = ep.ZipCode AND DATE(du.UsageTimestamp) = DATE(ep.PricesTimestamp);
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> CREATE VIEW MonthlyEnergySummary AS
+    ->      SELECT MONTH(UsageTimestamp) AS Month, YEAR(UsageTimestamp) AS Year, SUM(EnergyUsed) AS TotalEnergy,
+    ->             SUM(EnergyUsed * ep.PricePerkWh) AS TotalCost
+    ->      FROM DataUsage du
+    ->      JOIN EnrolledDevices ed ON du.EnrollmentID = ed.EnrollmentID
+    ->      JOIN EnergyPrices ep ON DATE(du.UsageTimestamp) = DATE(ep.PricesTimestamp)
+    ->      GROUP BY MONTH(UsageTimestamp), YEAR(UsageTimestamp);
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> show tables;
++------------------------------+
+| Tables_in_varsha             |
++------------------------------+
+| AverageConsumptionComparison |
+| Customers                    |
+| DailyEnergyConsumption       |
+| DataUsage                    |
+| Devices                      |
+| EnergyConsumptionPerDevice   |
+| EnergyConsumptionWithPricing |
+| EnergyPrices                 |
+| EnrolledDevices              |
+| MonthlyEnergySummary         |
+| ServiceLocations             |
+| users                        |
++------------------------------+
+12 rows in set (0.00 sec)
+
+mysql> ^C
+mysql> ^C
+mysql> ^C
+mysql> ^C
+mysql> ^C
+mysql> SELECT * FROM AverageConsumptionComparison
+    -> ;
+ERROR 1055 (42000): Expression #4 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'varsha.du.EnergyUsed' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
+mysql> ^C
+mysql> desc AverageConsumptionComparison;
++-----------------+---------------+------+-----+---------+-------+
+| Field           | Type          | Null | Key | Default | Extra |
++-----------------+---------------+------+-----+---------+-------+
+| SquareFootage   | int           | YES  |     | NULL    |       |
+| Occupants       | int           | YES  |     | NULL    |       |
+| UserTotalEnergy | decimal(32,2) | YES  |     | NULL    |       |
+| AvgEnergy       | decimal(14,6) | YES  |     | NULL    |       |
++-----------------+---------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> ^C
+mysql> SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> desc AverageConsumptionComparison;
++-----------------+---------------+------+-----+---------+-------+
+| Field           | Type          | Null | Key | Default | Extra |
++-----------------+---------------+------+-----+---------+-------+
+| SquareFootage   | int           | YES  |     | NULL    |       |
+| Occupants       | int           | YES  |     | NULL    |       |
+| UserTotalEnergy | decimal(32,2) | YES  |     | NULL    |       |
+| AvgEnergy       | decimal(14,6) | YES  |     | NULL    |       |
++-----------------+---------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT * FROM AverageConsumptionComparison;
+ERROR 1055 (42000): Expression #4 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'varsha.du.EnergyUsed' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
+mysql> ^C
+mysql> CREATE VIEW AverageConsumptionComparison AS
+    -> SELECT
+    ->     sl.SquareFootage,
+    ->     sl.Occupants,
+    ->     du.EnrollmentID,  -- Include all non-aggregated columns in GROUP BY
+    ->     SUM(du.EnergyUsed) AS UserTotalEnergy,
+    ->     AVG(du.EnergyUsed) OVER (PARTITION BY sl.SquareFootage, sl.Occupants) AS AvgEnergy
+    -> FROM
+    ->     DataUsage du
+    -> JOIN
+    ->     EnrolledDevices ed ON du.EnrollmentID = ed.EnrollmentID
+    -> JOIN
+    ->     ServiceLocations sl ON ed.SID = sl.SID
+    -> GROUP BY
+    ->     sl.SquareFootage,
+    ->     sl.Occupants,
+    ->     du.EnrollmentID;  
+ERROR 1050 (42S01): Table 'AverageConsumptionComparison' already exists
+mysql> drop table AverageConsumptionComparison
+    -> ^C
+mysql> drop table AverageConsumptionComparison;
+ERROR 1051 (42S02): Unknown table 'varsha.AverageConsumptionComparison'
+mysql> ^C
+mysql> delete table AverageConsumptionComparison;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'table AverageConsumptionComparison' at line 1
+mysql> ^C
+mysql> DROP VIEW IF EXISTS AverageConsumptionComparison;
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> CREATE VIEW AverageConsumptionComparison AS
+    -> SELECT
+    ->     sl.SquareFootage,
+    ->     sl.Occupants,
+    ->     du.EnrollmentID,  -- Include all non-aggregated columns in GROUP BY
+    ->     SUM(du.EnergyUsed) AS UserTotalEnergy,
+    ->     AVG(du.EnergyUsed) OVER (PARTITION BY sl.SquareFootage, sl.Occupants) AS AvgEnergy
+    -> FROM
+    ->     DataUsage du
+    -> JOIN
+    ->     EnrolledDevices ed ON du.EnrollmentID = ed.EnrollmentID
+    -> JOIN
+    ->     ServiceLocations sl ON ed.SID = sl.SID
+    -> GROUP BY
+    ->     sl.SquareFootage,
+    ->     sl.Occupants,
+    ->     du.EnrollmentID;  -- Include all non-aggregated columns in GROUP BY
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> select * from AverageConsumptionComparison
+    -> ^C
+mysql> select * from AverageConsumptionComparison;
+ERROR 1055 (42000): Expression #5 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'varsha.du.EnergyUsed' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
+mysql> SELECT * FROM DailyEnergyConsumption;
++------------+-------------+
+| Date       | TotalEnergy |
++------------+-------------+
+| 2022-08-01 |        5.10 |
+| 2023-12-01 |        2.00 |
+| 2022-09-01 |        5.00 |
++------------+-------------+
+3 rows in set (0.01 sec)
+
+mysql> SELECT * FROM EnergyConsumptionPerDevice;
++-----------------+-------------+
+| DeviceName      | TotalEnergy |
++-----------------+-------------+
+| Smart Meter     |       11.00 |
+| Refrigerator    |        1.10 |
+| Air Conditioner |        NULL |
++-----------------+-------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT * FROM EnergyConsumptionWithPricing;
++---------------------+------------+-------------+--------+----------------+
+| UsageTimestamp      | EnergyUsed | PricePerkWh | Cost   | MinPricePerkWh |
++---------------------+------------+-------------+--------+----------------+
+| 2022-08-01 12:00:00 |       1.00 |        0.10 | 0.1000 |           0.08 |
+| 2022-08-01 12:15:00 |       1.00 |        0.10 | 0.1000 |           0.08 |
+| 2022-08-01 12:30:00 |       1.00 |        0.10 | 0.1000 |           0.08 |
+| 2022-08-01 12:45:00 |       1.00 |        0.10 | 0.1000 |           0.08 |
+| 2022-08-01 13:00:00 |       NULL |        0.10 |   NULL |           0.08 |
+| 2022-08-01 13:15:00 |       NULL |        0.10 |   NULL |           0.08 |
+| 2022-08-01 12:15:00 |       NULL |        0.12 |   NULL |           0.08 |
+| 2022-08-01 12:30:00 |       0.10 |        0.12 | 0.0120 |           0.08 |
+| 2022-08-01 12:45:00 |       0.10 |        0.12 | 0.0120 |           0.08 |
+| 2022-08-01 13:00:00 |       0.20 |        0.12 | 0.0240 |           0.08 |
+| 2022-08-01 13:15:00 |       0.20 |        0.12 | 0.0240 |           0.08 |
+| 2022-08-01 13:30:00 |       0.20 |        0.12 | 0.0240 |           0.08 |
+| 2022-08-01 13:45:00 |       0.30 |        0.12 | 0.0360 |           0.08 |
+| 2022-09-01 12:15:00 |       2.00 |        0.10 | 0.2000 |           0.08 |
+| 2022-09-01 12:30:00 |       3.00 |        0.10 | 0.3000 |           0.08 |
+| 2022-09-01 12:30:00 |       NULL |        0.08 |   NULL |           0.08 |
++---------------------+------------+-------------+--------+----------------+
+16 rows in set (0.00 sec)
+
+mysql> SELECT * FROM MonthlyEnergySummary;
++-------+------+-------------+-----------+
+| Month | Year | TotalEnergy | TotalCost |
++-------+------+-------------+-----------+
+|     8 | 2022 |       15.30 |    1.5300 |
+|     9 | 2022 |       15.00 |    1.5000 |
++-------+------+-------------+-----------+
+2 rows in set (0.01 sec)
+
+mysql> 
