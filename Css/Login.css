@@ -1,0 +1,116 @@
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    height: 100vh;
+    background-color: rgb(236, 236, 236); 
+    background: url('https://as1.ftcdn.net/v2/jpg/02/16/48/06/1000_F_216480626_7D9oipMrGQ66GPni8c5D2j25i2aJqDio.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+header {
+    text-align: center;
+    padding: 20px;
+    
+    color: rgb(245, 242, 242);
+    margin-bottom: 20px;
+}
+
+header h1 {
+    margin: 0;
+}
+
+.container {
+    background-color: #fff;
+    padding: 100px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+h2 {
+    color: #333;
+}
+
+form {
+    display: inline-block;
+    text-align: left;
+    margin-top: 20px;
+}
+
+label {
+    display: block;
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #3498db;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: green;
+}
+
+#responseMessage {
+    margin-top: 20px;
+}
+
+p {
+    margin: 0;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.signup-container {
+    margin-top: 50px;
+}
+
+#signupButton {
+    background-color: #3498db;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#signupButton:hover {
+    background-color: green;
+}
+
+  .navbar {
+    background-color: #007bff; 
+    margin-top: 0;
+    z-index: 1000;
+  }
+  .navbar-nav .nav-link {
+    color: #ffffff !important; 
+  }
+
+  footer {
+    background: #f5f6f7;
+    color: #ffffff;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+  }
